@@ -9,7 +9,7 @@ import time
 
 #API url
 endpoint2 = 'https://na1.api.riotgames.com/tft/summoner/v1/summoners/'
-URL2 = {'api_key':'RGAPI-d2954600-28a8-4cd9-a868-b65f77bc7dd4'
+URL2 = {'api_key':'KEY_HERE'
           }
 #new file for puuids
 filename2 ="Challenger_puuids.csv"
