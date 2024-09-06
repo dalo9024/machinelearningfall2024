@@ -8,7 +8,7 @@ import time
 
 #API url
 endpoint4 = 'https://americas.api.riotgames.com/tft/match/v1/matches/'
-URL4 = {'api_key':'RGAPI-768a9138-01c5-4dac-a5bf-4c23b1cfb94f'
+URL4 = {'api_key':'KEY_HERE'
           }
 #filename for match data
 filename4 = "match_data.csv"
