@@ -36,7 +36,7 @@ for ID in puuids_df["puuid"]:
     endpoint3 = endpoint3 + str(ID) + "/ids"
     response3=requests.get(endpoint3, URL3)
     #need to slow down due to API restrictions
-    time.sleep(0.84)
+    time.sleep(1)
     game_json = response3.json()
     for items in game_json:
         WriteThis6 = str(items) + "\n"
