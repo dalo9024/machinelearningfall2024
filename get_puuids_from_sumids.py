@@ -32,7 +32,7 @@ for ID in summoner_df["summonerId"]:
     endpoint2 = endpoint2 + str(ID)
     response2=requests.get(endpoint2, URL2)
     #need to slow down due to API restrictions
-    time.sleep(0.84)
+    time.sleep(1)
     puuid_json = response2.json()
     puuid = puuid_json["puuid"]                     
     WriteThis4=str(puuid)+"\n"
