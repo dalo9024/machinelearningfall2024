@@ -9,7 +9,7 @@ import time
 
 #API url
 endpoint3 = 'https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/'
-URL3 = {'api_key':'RGAPI-cce76c81-d89f-4dcd-84e9-38c91de0fb33',
+URL3 = {'api_key':'KEY_HERE',
         'start':0,
         'endTime':1725408000,
         'startTime':1724889600,
