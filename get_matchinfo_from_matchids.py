@@ -35,7 +35,7 @@ for ID in match_df["game_id"]:
     endpoint4 = endpoint4 + str(ID)
     response4=requests.get(endpoint4, URL4)
     #need to slow down due to API restrictions
-    time.sleep(0.84)
+    time.sleep(1)
     matchinfo_json = response4.json()
     #writes all the data we are interested in to csv
     for items in matchinfo_json["info"]["participants"]:
