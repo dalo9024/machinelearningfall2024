@@ -1,7 +1,7 @@
 #removes missing values and values that suggest player gave up
 import pandas as pd
 
-df1 = pd.read_csv('match_data_test.csv')
+df1 = pd.read_csv('match_data.csv')
 
 #columns to check for missing values, also removes values that suggest giving up.
 columns_data_error= ['match_id', 'participant', 'gold_left', 'level', 'total_damage_to_players', 'players_eliminated', 'augments', 'placement']
