@@ -41,3 +41,27 @@ table_data = [['Column', 'Missing Values']] + list(zip(missing_values1.index, mi
 table = ax.table(cellText=table_data, colLabels=None, cellLoc='center', loc='center')
 #display table
 plt.show()
+
+#identifies impossible values from the dataset
+#numeric columnss for min and max
+num_cols = ['gold_left', 'level', 'total_damage_to_players', 'players_eliminated', 'num_traits', 'placement']
+#stores min/max values
+min_max_vals = df1_cleaned[num_cols].agg(['min','max']).T
+
+#counting the strings in augments and getting the min and max
+aug_len = df1_cleaned['augments'].apply(lambda x: len(x.split(';')))
+min_aug, max_aug = aug_len.min(), aug_len.max()
+
+#append augment count data to the rest
+min_max_vals.loc['Count_Augments'] = [min_aug, max_aug]
+
+#new fig
+fig, ax = plt.subplots(figsize=(8, 4))  # Set figure size
+ax.axis('tight')
+ax.axis('off')
+
+#data for the table
+table_data = [['Metric', 'Min', 'Max']] + [[index, row['min'], row['max']] for index, row in min_max_vals.iterrows()]
+#createtable
+table = ax.table(cellText=table_data, cellLoc='center', loc='center')
+plt.show()
