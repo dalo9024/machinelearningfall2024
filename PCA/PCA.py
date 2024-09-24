@@ -1,9 +1,8 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-
 
 
 #read in data
@@ -51,8 +50,11 @@ plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
 plt.legend(title='Placement', markerscale=8, bbox_to_anchor=(1, 1), loc='upper left')
 plt.tight_layout()
+
+#dispaly and save the figure
 plt.savefig('PCA2.png', format='png', dpi=300)
 plt.show()
+plt.close()
 
 ######################
 # PCA with 3 components
@@ -82,20 +84,47 @@ ax.set_zlabel('Principal Component 3')
 
 plt.legend(title='Placement', markerscale=8, bbox_to_anchor=(1, 1), loc='upper left')
 plt.tight_layout()
+
+#display and save the figure
 plt.savefig('PCA3.png', format='png', dpi=300)
 plt.show()
+plt.close()
 
 #########################
 # PCA with all components
 #########################
 pca5 = PCA(n_components=5)
 pca5.fit(scaled_df)
+#variance retained
 variance_retained = pca5.explained_variance_ratio_.cumsum()
 print("The cumulative explained variance as a ratio goes up as follows:", variance_retained)
-p_comp = range(1,6)
+
+#principle components
+principal_components = pca5.components_
+feature_names = scaled_df.columns
+pc_df = pd.DataFrame(principal_components, columns=feature_names)
+pc_df.index = [f'PC{i+1}' for i in range(pc_df.shape[0])]
+
+plt.figure(figsize=(10, 4))
+plt.axis('tight')
+plt.axis('off')
+table = plt.table(cellText=np.around(pc_df.values, decimals=2),
+                  colLabels=pc_df.columns,
+                  rowLabels=pc_df.index,
+                  cellLoc = 'center', 
+                  loc='center')
+
+#display and save the figure
+plt.savefig("pc_table.png", bbox_inches='tight', dpi=300)
+plt.show()
+plt.close()
+
+
+
 
 
 #plot of cumulative variance retained
+p_comp = range(1,6)
 plt.plot(p_comp, variance_retained, marker='o', linestyle='--')
 plt.axhline(y=0.95, color='red', label='95% Variance Retained')
 plt.title('Cumulative Variance Retained by Principal Components')
@@ -104,9 +133,16 @@ plt.ylabel('Cumulative Variance Retained')
 plt.xticks(p_comp)
 plt.legend() 
 plt.ylim(0, 1)
+
+#display and save figure
 plt.savefig('VarianceRetained.png', format='png', dpi=300)
 plt.show()
+plt.close()
 
+
+#eigenvalues
+eigenvalues = pca5.explained_variance_
+print("The top three eigenvalues are: ",eigenvalues[:3])
 
 #eigenvalues
 eigenvalues = pca5.explained_variance_
