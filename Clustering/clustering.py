@@ -96,7 +96,7 @@ for n_clusters in range_n_clusters:
     ax1.set_yticks([])  # Clear the y-axis labels
     ax1.set_xticks(np.arange(-1.1, 1.1, 0.2))
 
-    plt.savefig(f"silhouette_plot_n_clusters_{n_clusters}.png", bbox_inches='tight')
+    plt.savefig(f"silhouette_plot_n_clusters_{n_clusters}.png", bbox_inches="tight")
     plt.show()
     plt.close()
     
@@ -114,7 +114,7 @@ def plot_clusters(n_clusters):
 
     #colors for label
     unique_placements = sorted(dflabel.unique())
-    colors = ['blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow', 'black']
+    colors = ["blue", "green", "orange", "purple", "cyan", "magenta", "yellow", "black"]
     color_map = {placement: colors[i % len(colors)] for i, placement in enumerate(unique_placements)}
 
     #add points for each cluster
@@ -123,13 +123,13 @@ def plot_clusters(n_clusters):
         
         #add trace for cluster
         fig.add_trace(go.Scatter3d(
-            x=cluster_points['PC1'],
-            y=cluster_points['PC2'],
-            z=cluster_points['PC3'],
-            mode='markers',
+            x=cluster_points["PC1"],
+            y=cluster_points["PC2"],
+            z=cluster_points["PC3"],
+            mode="markers",
             marker=dict(size=5, opacity=0.25, color=[color_map[placement] for placement in dflabel[cluster_labels == cluster]]),
-            name=f'Cluster {cluster}',
-            legendgroup=f'Cluster {cluster}'
+            name=f"Cluster {cluster}",
+            legendgroup=f"Cluster {cluster}"
         ))
 
     #add centroids
@@ -139,9 +139,9 @@ def plot_clusters(n_clusters):
             y=[center[1]],
             z=[center[2]],
             mode='markers',
-            marker=dict(size=10, color='red', symbol='x'),  # Use 'X' marker for centroids
-            name=f'Centroid {i}',
-            showlegend=False\
+            marker=dict(size=10, color="red", symbol="x"),
+            name=f"Centroid {i}",
+            showlegend=False
         ))
 
     #placement legend
@@ -150,32 +150,32 @@ def plot_clusters(n_clusters):
             x=[None],
             y=[None],
             z=[None],
-            mode='markers',
+            mode="markers",
             marker=dict(size=10, color=color_map[placement]),
-            name=f'Placement: {placement}',
-            legendgroup='Placement',
+            name=f"Placement: {placement}",
+            legendgroup="Placement",
             showlegend=True
         ))
 
     #axis
     fig.update_layout(
-        title=f'Clustering {n_clusters} Clusters',
+        title=f"Clustering {n_clusters} Clusters",
         scene=dict(
-            xaxis_title='PC1',
-            yaxis_title='PC2',
-            zaxis_title='PC3',
-            xaxis=dict(range=[transformed['PC1'].min(), transformed['PC1'].max()]),
-            yaxis=dict(range=[transformed['PC2'].min(), transformed['PC2'].max()]),
-            zaxis=dict(range=[transformed['PC3'].min(), transformed['PC3'].max()]),
-            aspectmode='cube',
+            xaxis_title="PC1",
+            yaxis_title="PC2",
+            zaxis_title="PC3",
+            xaxis=dict(range=[transformed["PC1"].min(), transformed["PC1"].max()]),
+            yaxis=dict(range=[transformed["PC2"].min(), transformed["PC2"].max()]),
+            zaxis=dict(range=[transformed['PC3'].min(), transformed["PC3"].max()]),
+            aspectmode="cube",
         ),
-        plot_bgcolor='white',  
-        paper_bgcolor='white',  
-        legend=dict(title='Legend')
+        plot_bgcolor="white",  
+        paper_bgcolor="white",  
+        legend=dict(title="Legend")
     )
 
     #save as html
-    fig.write_html(f'3D_clustering_{n_clusters}.html')
+    fig.write_html(f"3D_clustering_{n_clusters}.html")
 
 #plot and save for each number of clusters
 for clusters in [2, 3, 4, 8]:
