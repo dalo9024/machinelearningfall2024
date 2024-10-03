@@ -7,6 +7,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_samples, silhouette_score
+from sklearn.cluster import DBSCAN
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 
 #read in data
 df = pd.read_csv("encoded_data.csv")
