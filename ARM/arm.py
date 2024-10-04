@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Oct  3 23:53:37 2024
-
-@author: daniel_long
-"""
 #libraries used
 import pandas as pd
 import networkx as nx
