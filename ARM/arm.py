@@ -1,72 +1,92 @@
 #libraries used
 import pandas as pd
+import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-from mlxtend.preprocessing import TransactionEncoder
 from mlxtend.frequent_patterns import apriori, association_rules
 
 #read in data
-df = pd.read_csv('match_data.csv')  
+df = pd.read_csv('match_data.csv')
 
-#go from ; separated strings to lists also shorten the strings so the important parts are there
+#split the ; seperated lists and keep only the important part
 def split_str(text):
-    if isinstance(text, str) and text:  # Check if text is a non-empty string
+    if isinstance(text, str) and text:
         return [part.split('_')[-1] for part in text.split(';') if '_' in part]
-    return []  # Return an empty list for non-strings or empty strings
+    return []  
 
 for col in ['augments', 'traits', 'units', 'items']:
     df[col] = df[col].apply(split_str)
 
-#change placement to categorical data
+#change placement to string
 df['placement'] = df['placement'].apply(lambda x: f'Placement_{x}')
 
-#combine everything into a basket
-df['basket_items'] = df[['augments', 'traits', 'units', 'items']].apply(lambda row: sum(row, []), axis=1)
+#tag the items so the original column is known
+def tag_items(row):
+    augments = [f'augment_{item}' for item in row['augments']] if isinstance(row['augments'], list) else []
+    traits = [f'trait_{item}' for item in row['traits']] if isinstance(row['traits'], list) else []
+    units = [f'unit_{item}' for item in row['units']] if isinstance(row['units'], list) else []
+    items = [f'item_{item}' for item in row['items']] if isinstance(row['items'], list) else []
+    return augments + traits + units + items
+
+#create transaction data and tag each item
+df['basket_items'] = df[['augments', 'traits', 'units', 'items']].apply(tag_items, axis=1)
 df['basket_items'] = df[['basket_items', 'placement']].apply(lambda row: row['basket_items'] + [row['placement']], axis=1)
 
-#transform data for apriori
-te = TransactionEncoder()
-te_ary = te.fit(df['basket_items']).transform(df['basket_items'])
-df_trans = pd.DataFrame(te_ary, columns=te.columns_)
+#change the data to a list
+transactions = df['basket_items'].tolist()
 
-#apriori
-frequent_itemsets = apriori(df_trans, min_support=0.1, use_colnames=True)
+#remove and duplicates 
+transactions = [list(set(transaction)) for transaction in transactions]
+
+#create one hot encoding array
+all_items = sorted(set(item for transaction in transactions for item in transaction))
+num_transactions = len(transactions)
+one_hot_array = np.zeros((num_transactions, len(all_items)), dtype=bool)
+
+for i, transaction in enumerate(transactions):
+    one_hot_array[i, [all_items.index(item) for item in transaction]] = True
+
+#convert to dataframe for apriori()
+one_hot_df = pd.DataFrame(one_hot_array, columns=all_items)
+
+#find frequent itemsets
+frequent_itemsets = apriori(one_hot_df, min_support=0.1, use_colnames=True)
+
+#get association rules above confidence threshold
 rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.7)
 
-#get top 15 for each measure
-top_support = rules.sort_values(by='support', ascending=False).head(15)
-top_confidence = rules.sort_values(by='confidence', ascending=False).head(15)
-top_lift = rules.sort_values(by='lift', ascending=False).head(15)
+#top 15 rules based on measures
+top_support = rules.nlargest(15, 'support')
+top_confidence = rules.nlargest(15, 'confidence')
+top_lift = rules.nlargest(15, 'lift')
 
-#display top rules
-print("Support")
+top_support.to_csv('top_support.csv', index=False)
+top_confidence.to_csv('top_confidence.csv', index=False)
+top_lift.to_csv('top_lift.csv', index=False)
+
+
+print("Top 15 Rules by Support:")
 print(top_support[['antecedents', 'consequents', 'support', 'confidence', 'lift']])
-
-print("Confidence")
+print("\nTop 15 Rules by Confidence:")
 print(top_confidence[['antecedents', 'consequents', 'support', 'confidence', 'lift']])
-
-print("Lift")
+print("\nTop 15 Rules by Lift:")
 print(top_lift[['antecedents', 'consequents', 'support', 'confidence', 'lift']])
 
-#create network graph
+#combine all the rules to a df
+combined_rules = pd.concat([top_support, top_confidence, top_lift]).drop_duplicates()
+
+#create graph
 G = nx.DiGraph()
 
-#add edges from rules
-def add_edges_from_rules(rules_df):
-    for _, rule in rules_df.iterrows():
-        antecedents = list(rule['antecedents'])
-        consequents = list(rule['consequents'])
-        for ant in antecedents:
-            for con in consequents:
-                G.add_edge(ant, con, weight=rule['support'], 
-                           confidence=rule['confidence'], lift=rule['lift'])
+#add edges for the rules
+for _, rule in combined_rules.iterrows():
+    antecedents = list(rule['antecedents'])
+    consequents = list(rule['consequents'])
+    for ant in antecedents:
+        for con in consequents:
+            G.add_edge(ant, con, weight=rule['support'])
 
-#add edges from each set of rules
-add_edges_from_rules(top_support)
-add_edges_from_rules(top_confidence)
-add_edges_from_rules(top_lift)
-
-#color map based on original column
+#color based on original column
 color_map = {
     'augments': 'blue',
     'traits': 'green',
@@ -75,29 +95,34 @@ color_map = {
     'placement': 'cyan'
 }
 
-#list to store node colors
+#stores node colors
 node_colors = []
 
-#colors based on original column
+#assign colors to nodes
 for node in G.nodes:
-    for col in color_map.keys():
-        exploded_col = df[col].explode().apply(lambda x: x.split('_')[-1] if isinstance(x, str) else x)
-        if node in exploded_col.unique():
-            node_colors.append(color_map[col])
-            break
+    if 'augment_' in node:
+        node_colors.append(color_map['augments'])
+    elif 'trait_' in node:
+        node_colors.append(color_map['traits'])
+    elif 'unit_' in node:
+        node_colors.append(color_map['units'])
+    elif 'item_' in node:
+        node_colors.append(color_map['items'])
+    elif 'Placement_' in node:
+        node_colors.append(color_map['placement'])
 
-#adjust edge width based on confidence and node sizes based on node connections
-edge_widths = [G[u][v]['confidence'] * 2 for u, v in G.edges]
-node_sizes = [G.degree(n) * 200 for n in G.nodes]
-
+#draw network graph
 plt.figure(figsize=(12, 12))
+pos = nx.spring_layout(G, k = 0.5, seed=42) 
 
-#layout type and drawing nodes and edges
-pos = nx.spring_layout(G, scale = 10, seed = 100)
-nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color=node_colors, alpha=0.3)
-nx.draw_networkx_edges(G, pos, width=edge_widths, alpha=0.6, edge_color='gray')  
+#node size based on amount of connections
+node_sizes = [G.degree(n) * 50 for n in G.nodes]
+ 
+#draw nodes and edges
+nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=node_sizes,alpha=0.6)
+nx.draw_networkx_edges(G, pos, alpha=0.5, edge_color='gray')
 nx.draw_networkx_labels(G, pos, font_size=10)
 
 plt.title("Association Rule Network (Top 15 by Support, Confidence, and Lift)")
-plt.show()
+plt.axis('off')  
 
