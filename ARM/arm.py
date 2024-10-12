@@ -18,7 +18,7 @@ for col in ['augments', 'traits', 'units', 'items']:
     df[col] = df[col].apply(split_str)
 
 #change placement to string
-df['placement'] = df['placement'].apply(lambda x: f'Placement_{x}')
+df['placement'] = df['placement'].apply(lambda x: 'top 4' if x <= 4 else 'bottom 4')
 
 #tag the items so the original column is known
 def tag_items(row):
@@ -31,12 +31,15 @@ def tag_items(row):
 #create transaction data and tag each item
 df['basket_items'] = df[['augments', 'traits', 'units', 'items']].apply(tag_items, axis=1)
 df['basket_items'] = df[['basket_items', 'placement']].apply(lambda row: row['basket_items'] + [row['placement']], axis=1)
+df['basket_items'].to_csv('basket.csv')
 
 #change the data to a list
 transactions = df['basket_items'].tolist()
 
+
 #remove and duplicates 
 transactions = [list(set(transaction)) for transaction in transactions]
+
 
 #create one hot encoding array
 all_items = sorted(set(item for transaction in transactions for item in transaction))
@@ -48,6 +51,7 @@ for i, transaction in enumerate(transactions):
 
 #convert to dataframe for apriori()
 one_hot_df = pd.DataFrame(one_hot_array, columns=all_items)
+one_hot_df.to_csv('arm_data.csv')
 
 #find frequent itemsets
 frequent_itemsets = apriori(one_hot_df, min_support=0.1, use_colnames=True)
@@ -125,4 +129,3 @@ nx.draw_networkx_labels(G, pos, font_size=10)
 
 plt.title("Association Rule Network (Top 15 by Support, Confidence, and Lift)")
 plt.axis('off')  
-
