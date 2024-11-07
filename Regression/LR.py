@@ -28,7 +28,7 @@ train_data.to_csv('train_data.csv', index=False)
 test_data.to_csv('test_data.csv', index=False)
 
 #Logistic Regression
-lr = LogisticRegression(penalty = 'l2', solver = 'newton-cg').fit(x_train, y_train)
+lr = LogisticRegression(penalty = None, solver = 'newton-cg').fit(x_train, y_train)
 
 #test_data predicitons lr
 predictions_lr = lr.predict(x_test)
