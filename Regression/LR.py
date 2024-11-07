@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score
 from sklearn.naive_bayes import MultinomialNB
 
 #read in data
@@ -33,6 +33,10 @@ lr = LogisticRegression(penalty = None, solver = 'newton-cg').fit(x_train, y_tra
 #test_data predicitons lr
 predictions_lr = lr.predict(x_test)
 
+#accuracy for logistic regression
+accuracy_lr = accuracy_score(y_test, predictions_lr)
+print(f"Accuracy for Logistic Regression: {accuracy_lr:.2f}")
+
 #confusion matrix lr
 cm_lr = confusion_matrix(y_test, predictions_lr, labels = lr.classes_)
 disp_lr = ConfusionMatrixDisplay(confusion_matrix = cm_lr, display_labels = lr.classes_)
@@ -46,12 +50,13 @@ nb = MultinomialNB().fit(x_train, y_train)
 #test_data predicitons nb
 predictions_nb = nb.predict(x_test)
 
+#accuracy of naive bayes
+accuracy_nb = accuracy_score(y_test, predictions_nb)
+print(f"Accuracy for Multinomial Naive Bayes: {accuracy_nb:.2f}")
+
 #confusion matrix nb
 cm_nb = confusion_matrix(y_test, predictions_nb, labels = nb.classes_)
 disp = ConfusionMatrixDisplay(confusion_matrix = cm_nb, display_labels = nb.classes_)
 disp.plot(cmap = 'cividis')
 plt.title('Confusion Matrix Multinomial Naive Bayes')
 plt.show()
-
-
-
