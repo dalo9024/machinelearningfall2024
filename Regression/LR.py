@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-from sklearn.preprocessing import StandardScaler
 from sklearn.naive_bayes import MultinomialNB
 
 #read in data
@@ -37,7 +36,8 @@ predictions_lr = lr.predict(x_test)
 #confusion matrix lr
 cm_lr = confusion_matrix(y_test, predictions_lr, labels = lr.classes_)
 disp_lr = ConfusionMatrixDisplay(confusion_matrix = cm_lr, display_labels = lr.classes_)
-disp_lr.plot(cmap = 'viridis_r')
+disp_lr.plot(cmap = 'cividis')
+plt.title("Confusion Matrix Logistic Regression")
 plt.show()
 
 #Naive Bayes
@@ -49,9 +49,9 @@ predictions_nb = nb.predict(x_test)
 #confusion matrix nb
 cm_nb = confusion_matrix(y_test, predictions_nb, labels = nb.classes_)
 disp = ConfusionMatrixDisplay(confusion_matrix = cm_nb, display_labels = nb.classes_)
-disp.plot(cmap = 'coolwarm')
+disp.plot(cmap = 'cividis')
+plt.title('Confusion Matrix Multinomial Naive Bayes')
 plt.show()
-
 
 
 
