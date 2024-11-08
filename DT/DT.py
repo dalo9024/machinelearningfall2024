@@ -30,21 +30,21 @@ def accuracy_confusion_matrix(model, x_test, y_test, title):
     plt.show()
 
 # Decision Tree 1
-tree1 = DecisionTreeClassifier(max_depth=1, criterion='gini', random_state=0)
+tree1 = DecisionTreeClassifier(max_depth=5, criterion='gini', random_state=0)
 tree1.fit(x_train, y_train)
 
 #accuracy and confusion matrix tree 1
 accuracy_confusion_matrix(tree1, x_test, y_test, "Decision Tree 1")
 
 #plot of tree 1
-plt.figure(figsize=(12, 8), dpi=300) 
+plt.figure(figsize=(12, 8), dpi=600) 
 plot_tree(tree1, feature_names=x_train.columns, filled=True, rounded=True, class_names=['Bottom 4', 'Top 4'])
 plt.title('Tree 1')
 plt.show()
 
 
 # Decision Tree 2
-tree2 = DecisionTreeClassifier(criterion='gini', max_depth=3, random_state=0, max_features="sqrt")
+tree2 = DecisionTreeClassifier(criterion='gini', max_depth=2, random_state=0, max_features="sqrt")
 tree2.fit(x_train, y_train)
 
 #accuracy and confusion matrix tree 2
@@ -57,7 +57,7 @@ plt.title('Tree 2')
 plt.show()
 
 # Decision Tree 3
-tree3 = DecisionTreeClassifier(min_samples_leaf=5, max_depth=4, criterion='gini', random_state=100, max_features='log2')
+tree3 = DecisionTreeClassifier(min_samples_leaf=5, max_depth=3, criterion='entropy', random_state=0, max_features='log2')
 tree3.fit(x_train, y_train)
 
 #accuracy and confusion matrix tree 3
